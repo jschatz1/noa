@@ -1,0 +1,257 @@
+%lex
+
+%%
+
+\/\/.*                            /* skip comment */
+\/\*(.|\s)*\*\/                   /* skip comments */
+
+\s+                               /* skip whitespace */
+
+\bfn\b                            return 'DEF'
+\breturn\b                        return 'RETURN'
+\bclass\b                         return 'CLASS'
+\bstruct\b                        return 'STRUCT'
+\bextends\b                       return 'EXTENDS'
+
+\d+                               return 'NUMBER'
+\w+                               return 'IDENTIFIER'
+
+\bpub\b                           return 'PUBLIC'
+\bshh\b                           return 'PRIVATE'
+
+[\+\-]                            return 'ADDITIVE_OPERATION'
+[\*\/]                            return 'MULTIPLICATIVE_OPERATION'
+
+/lex
+
+%{
+
+function BinaryExpression(left, op, right) {
+  return {
+    type: 'BinaryExpression',
+    op,
+    left,
+    right
+  };
+}
+
+%}
+
+%%
+
+Program
+  : StatementList
+    {
+      $$ = {
+        type: 'Program',
+        body: $1,
+      }  
+    }
+  ;
+
+StatementList
+  : Statement
+    { $$ = [$1] }
+  | StatementList Statement
+    { $1.push($2); $$ = $1 }
+  ;
+
+Statement
+  : ExpressionStatement
+  | EmptyStatement
+  | BlockStatement
+  | ClassDeclaration
+  | FunctionDeclaration
+  | ReturnStatement
+  ;
+
+FunctionDeclaration
+  : OptFunctionVisibilityDeclaration DEF Identifier '(' OptFormalParameterList ')' OptFunctionReturnType BlockStatement
+    {
+      $$ = {
+        type: 'FunctionDeclaration',
+        visibility: $1,
+        name: $3,
+        params: $5,
+        returnType: $7,
+        body: $8
+      }
+    }
+  ;
+
+OptFunctionVisibilityDeclaration
+  : FunctionVisibilityDeclaration
+  | /* empty */
+    { $$ = null }
+  ;
+
+FunctionVisibilityDeclaration
+  : PUBLIC
+    { $$ = $1 }
+  | PRIVATE
+    { $$ = $1 }
+  ;
+
+ClassDeclaration
+  : CLASS Identifier OptClassExtends Statement
+    {
+      $$ = {
+        type: 'ClassDeclaration',
+        id: $2,
+        superClass: $3,
+        body: $4,
+      }
+    }
+  ;
+
+OptClassExtends 
+  : ClassExtends
+  | /* empty */
+    { $$ = null }
+  ;
+
+ClassExtends
+  : EXTENDS Identifier
+    { $$ = $2 }
+  ;
+
+Identifier
+  : IDENTIFIER
+    {
+      $$ = {
+        type: 'Identifier',
+        value: $1,
+      }
+    }
+  ;
+
+TypeIdentifier
+  : Identifier ':' Identifier
+    {
+      $$ = {
+        type: 'TypeIdentifier',
+        value: {
+          name: $1.value, type: $3.value
+        }
+      } 
+    }
+  ;
+
+OptFormalParameterList
+  : FormalParameterList
+  | /* empty */
+    { $$ = [] }
+  ;
+
+OptFunctionReturnType
+  : FormalFunctionReturnType
+  | /* empty */
+    { $$ = null }
+  ;
+
+FormalFunctionReturnType
+  : ':' Identifier
+  { $$ = { type: $2.value } }
+  ;
+
+FormalParameterList
+  : TypeIdentifier
+    { $$ = [$1] }
+  | FormalParameterList ',' TypeIdentifier
+    { $1.push($3); $1 }
+  ;
+
+ExpressionStatement
+  : Expression ';'
+    { 
+      $$ = {
+        type: 'ExpressionStatement',
+        expression: $1,
+      }
+    }
+  ;
+
+ReturnStatement
+  : RETURN OptExpression ';'
+    {
+      $$ = {
+        type: 'ReturnStatement',
+        argument: $2,
+      }
+    }
+  ;
+
+OptExpression
+  : Expression
+  | /* empty */
+    { $$ = null }
+  ;
+
+EmptyStatement
+  : ';'
+  {
+    $$ = {
+      type: 'EmptyStatement',
+    }
+  }
+  ;
+
+BlockStatement
+  : '{' OptStatementList '}'
+  {
+    $$ = {
+      type: 'BlockStatement',
+      body: $2
+    }
+  }
+  ;
+
+OptStatementList
+  : StatementList
+  | /* empty */
+    { $$ = [] }
+  ;
+
+Expression
+  : AdditiveExpression
+  ;
+
+AdditiveExpression
+  : AdditiveExpression ADDITIVE_OPERATION MultiplicativeExpression
+    {
+      $$ = BinaryExpression($1, $2, $3)
+    }
+  | MultiplicativeExpression
+  ;
+
+MultiplicativeExpression
+  : MultiplicativeExpression MULTIPLICATIVE_OPERATION PrimaryExpression
+    {
+      $$ = BinaryExpression($1, $2, $3)
+    }
+  | PrimaryExpression
+  ;
+
+PrimaryExpression
+  : Literal
+  | Identifier
+  | ParenthesizedExpression
+  ;
+
+Literal
+  : NumericLiteral
+  ;
+
+NumericLiteral
+  : NUMBER 
+    {
+      $$ = {
+        type: 'NumericLiteral',
+        value: Number($1)
+      }
+    }
+  ;
+
+ParenthesizedExpression
+  : '(' Expression ')' { $$ = $2 }
+  ;
