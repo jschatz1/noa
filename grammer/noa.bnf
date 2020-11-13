@@ -7,7 +7,7 @@
 
 \s+                               /* skip whitespace */
 
-\bfn\b                            return 'DEF'
+\b(pub|shh)\b                     return 'DEF'
 \breturn\b                        return 'RETURN'
 \bclass\b                         return 'CLASS'
 \bstruct\b                        return 'STRUCT'
@@ -15,9 +15,6 @@
 
 \d+                               return 'NUMBER'
 \w+                               return 'IDENTIFIER'
-
-\bpub\b                           return 'PUBLIC'
-\bshh\b                           return 'PRIVATE'
 
 [\+\-]                            return 'ADDITIVE_OPERATION'
 [\*\/]                            return 'MULTIPLICATIVE_OPERATION'
@@ -66,30 +63,17 @@ Statement
   ;
 
 FunctionDeclaration
-  : OptFunctionVisibilityDeclaration DEF Identifier '(' OptFormalParameterList ')' OptFunctionReturnType BlockStatement
+  : DEF Identifier '(' OptFormalParameterList ')' OptFunctionReturnType BlockStatement
     {
       $$ = {
         type: 'FunctionDeclaration',
         visibility: $1,
-        name: $3,
-        params: $5,
-        returnType: $7,
-        body: $8
+        name: $2,
+        params: $4,
+        returnType: $6,
+        body: $7
       }
     }
-  ;
-
-OptFunctionVisibilityDeclaration
-  : FunctionVisibilityDeclaration
-  | /* empty */
-    { $$ = null }
-  ;
-
-FunctionVisibilityDeclaration
-  : PUBLIC
-    { $$ = $1 }
-  | PRIVATE
-    { $$ = $1 }
   ;
 
 ClassDeclaration

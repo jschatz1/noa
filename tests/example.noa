@@ -2,10 +2,10 @@
 // syntax-cli --grammar grammer/noa.bnf --mode LALR1 --file tests/
 
 class BigMath extends Math {
-  pub fn sum(a:number, b:number): number {
-    return a + b;
+  pub fib(n: number): void {
+    
   }
-
-  fn fib(n: number): void {
+  shh sum(a:number, b:number): number {
+    return a + b;
   }
 }
