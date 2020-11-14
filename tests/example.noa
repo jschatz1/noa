@@ -1,11 +1,6 @@
-// Run via:
-// syntax-cli --grammar grammer/noa.bnf --mode LALR1 --file tests/
+7 * 2;
 
-class BigMath extends Math {
-  pub fib(n: number): void {
-    
-  }
-  shh sum(a:number, b:number): number {
-    return a + b;
-  }
-}
+// a:string = 3;
+// b:number = 2;
+// a = 4;
+// b = 7 + 2;
