@@ -1,4 +1,6 @@
 7 * 2;
+a:string = 8;
+a = 2;
 
 // a:string = 3;
 // b:number = 2;

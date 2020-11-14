@@ -28,7 +28,7 @@
 \|\|                              return 'LOGICAL_OR'
 
 \=                                return 'SIMPLE_ASSIGN'
-[*/+\-]=                          return 'COMPLEX_ASSIGN'
+[*/\+\-]\=                        return 'COMPLEX_ASSIGN'
 
 [\+\-]                            return 'ADDITIVE_OPERATION'
 [\*\/]                            return 'MULTIPLICATIVE_OPERATION'
@@ -265,7 +265,7 @@ OptStatementList
   ;
 
 Expression
-  : AdditiveExpression
+  : TypeAssignmentExpression
   ;
 
 TypeAssignmentExpression
