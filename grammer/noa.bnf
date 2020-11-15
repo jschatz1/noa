@@ -58,6 +58,14 @@ yyparse.onParseEnd = (value) => {
   console.log('Parsed:', value);
 };
 
+yyparse.onToken = (a,b,c,d) => {
+  console.log("On Token:", a,b,c,d);
+};
+
+yyparse.onShift = (a,b,c,d) => {
+  console.log("On Shift:", a,b,c,d);
+};
+
 function BinaryExpression(left, op, right) {
   return {
     type: 'BinaryExpression',
