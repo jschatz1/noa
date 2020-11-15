@@ -1,0 +1,21 @@
+class Component {
+  pub render() {
+  }
+  pvt calculateGravity() {
+    return 2;
+  }
+}
+
+class Button extends Component {
+  pub SpecificPerson() {
+  }
+}
+
+extension Button {
+  name:string = 2;
+  label:string = 2;
+
+  pub render() {
+    return 2;
+  }
+}

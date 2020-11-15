@@ -7,31 +7,34 @@
 
 \s+                               /* skip whitespace */
 
-\b(pub|shh)\b                     return 'DEF'
-\breturn\b                        return 'RETURN'
-\bclass\b                         return 'CLASS'
-\bstruct\b                        return 'STRUCT'
-\bextends\b                       return 'EXTENDS'
-\bif\b                            return 'IF'
-\belse\b                          return 'ELSE'
-\btrue\b                          return 'TRUE'
-\bfalse\b                         return 'FALSE'
-\bnull\b                          return 'NULL'
+\b(pub|pvt)\b                                                  return 'DEF'
+\breturn\b                                                     return 'RETURN'
+\b(let|const)\b                                                return 'LET'
+\bclass\b                                                      return 'CLASS'
+\bextension\b                                                  return 'EXTENSION'
+\bstruct\b                                                     return 'STRUCT'
+\bextends\b                                                    return 'EXTENDS'
+\bif\b                                                         return 'IF'
+\belse\b                                                       return 'ELSE'
+\btrue\b                                                       return 'TRUE'
+\bfalse\b                                                      return 'FALSE'
+\bnull\b                                                       return 'NULL'
 
-\d+                               return 'NUMBER'
-\w+                               return 'IDENTIFIER'
+[+\-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?               return 'NUMBER'
+\'([^\\\']|\\.)*\'|\"([^\\\"]|\\.)*\"                          return 'STRING'
+\w+                                                            return 'IDENTIFIER'
 
-[\=!]\=                           return 'EQUALITY_OPERATOR'
-[><]\=?                           return 'RELATIONAL_OPERATOR'
+[\=!]\=                                                        return 'EQUALITY_OPERATOR'
+[><]\=?                                                        return 'RELATIONAL_OPERATOR'
 
-\&\&                              return 'LOGICAL_AND'
-\|\|                              return 'LOGICAL_OR'
+\&\&                                                           return 'LOGICAL_AND'
+\|\|                                                           return 'LOGICAL_OR'
 
-\=                                return 'SIMPLE_ASSIGN'
-[*/\+\-]\=                        return 'COMPLEX_ASSIGN'
+\=                                                             return 'SIMPLE_ASSIGN'
+[*/\+\-]\=                                                     return 'COMPLEX_ASSIGN'
 
-[\+\-]                            return 'ADDITIVE_OPERATION'
-[\*\/]                            return 'MULTIPLICATIVE_OPERATION'
+[\+\-]                                                         return 'ADDITIVE_OPERATION'
+[\*\/]                                                         return 'MULTIPLICATIVE_OPERATION'
 
 /lex
 
@@ -65,6 +68,7 @@ function BinaryExpression(left, op, right) {
 }
 
 function Literal(namePrefix, value) {
+  console.log("Literal")
   return {
     type: `${namePrefix}Literal`,
     value,
@@ -118,9 +122,49 @@ Statement
   | EmptyStatement
   | BlockStatement
   | ClassDeclaration
+  | ExtensionDeclaration
   | FunctionDeclaration
   | ReturnStatement
   | IfStatement
+  | VariableStatement
+  ;
+
+VariableStatement
+  : LET VariableDeclarationList
+    {
+      $$ = {
+        type: 'VariableStatement',
+        declaration: $2
+      }
+    }
+  ;
+
+VariableDeclarationList
+  : VariableDeclaration
+    { $$ = [$1] }
+  | VariableDeclarationList ',' VariableDeclaration
+    { $1.push($3); $$ = $1 }
+  ;
+
+VariableDeclaration
+  : TypeIdentifier OptVariableInitializer
+    {
+      $$ = {
+        type: 'VariableDeclaration',
+        id: $1,
+        init: $2,
+      }
+    }
+  ;
+
+OptVariableInitializer
+  : VariableInitializer
+  | /* empty */
+  ;
+
+VariableInitializer
+  : SIMPLE_ASSIGN AssignmentExpression
+    { $$ = $2 }
   ;
 
 IfStatement
@@ -151,7 +195,18 @@ ClassDeclaration
         type: 'ClassDeclaration',
         id: $2,
         superClass: $3,
-        body: $4,
+        body: $4
+      }
+    }
+  ;
+
+ExtensionDeclaration
+   : EXTENSION Identifier Statement
+    {
+      $$ = {
+        type: 'ExtensionDeclaration',
+        id: $2,
+        body: $3
       }
     }
   ;
@@ -265,20 +320,7 @@ OptStatementList
   ;
 
 Expression
-  : TypeAssignmentExpression
-  ;
-
-TypeAssignmentExpression
   : AssignmentExpression
-  | LeftHandSideTypedExpression SIMPLE_ASSIGN AssignmentExpression
-    {
-      $$ = {
-        type: 'TypeAssignmentExpression',
-        left: $1,
-        op: $2,
-        right: $3
-      }
-    }
   ;
 
 AssignmentExpression
@@ -292,10 +334,6 @@ AssignmentExpression
         right: $3
       }
     }
-  ;
-
-LeftHandSideTypedExpression
-  : TypeIdentifier
   ;
 
 LeftHandSideExpression
@@ -354,7 +392,8 @@ PrimaryExpression
   ;
 
 Literal
-  : NumericLiteral
+  : StringLiteral
+  | NumericLiteral
   | TrueLiteral
   | FalseLiteral
   | NullLiteral
@@ -370,6 +409,16 @@ FalseLiteral
 
 NullLiteral
   : NULL { $$ = Literal('Numeric', null) }
+  ;
+
+StringLiteral
+  : STRING
+    {
+      $$ = {
+        type: 'StringLiteral',
+        value: String($1)
+      }
+    }
   ;
 
 NumericLiteral

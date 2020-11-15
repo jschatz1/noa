@@ -1,0 +1,32 @@
+pub isEqual(a:Boolean) {
+  if(a == 2) {
+    return true;
+  } else {
+    return false;
+  } 
+}
+
+pub isMore(a:Boolean) {
+  if(a >= 2) {
+    return true;
+  } else {
+    return false;
+  } 
+}
+
+pub isMore(a:Boolean) {
+  if(a <= 2) {
+    return true;
+  } else {
+    return false;
+  } 
+}
+
+pub isMore(a:Boolean) {
+  if(a <= 2) {
+    return true;
+  } else {
+    return false;
+  } 
+}
+
