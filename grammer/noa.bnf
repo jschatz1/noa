@@ -51,19 +51,15 @@ class Primary extends Node {}
 // attaching to `yyparse` object.
 
 yyparse.onParseBegin = (string) => {
-  console.log('Parsing:', string);
 };
 
 yyparse.onParseEnd = (value) => {
-  console.log('Parsed:', value);
 };
 
 yyparse.onToken = (a,b,c,d) => {
-  console.log("On Token:", a,b,c,d);
 };
 
 yyparse.onShift = (a,b,c,d) => {
-  console.log("On Shift:", a,b,c,d);
 };
 
 function BinaryExpression(left, op, right) {
@@ -105,6 +101,7 @@ function LogicalExpression(left, op, right) {
 
 %nonassoc THEN
 %nonassoc ELSE
+%nonassoc PRIMARY
 
 %%
 
@@ -394,8 +391,7 @@ MultiplicativeExpression
   ;
 
 PrimaryExpression
-  : Literal
-  | Identifier
+  : Literal %prec PRIMARY
   | ParenthesizedExpression
   ;
 

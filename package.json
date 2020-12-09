@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "conflicts": "jison -p lalr -t grammer/noa.bnf > log",
+    "conflicts": "jison -p lalr -t grammer/noa.bnf -t > log",
     "test": "set -e;for i in tests/*.noa; do echo \"Testing $i\";syntax-cli --grammar grammer/noa.bnf --mode LALR1 --file $i --validate; done",
     "build": "set -e && syntax-cli --grammar grammer/noa.bnf --mode LALR1 --output out.js && browserify noa_require.js -o noa.js"
   },

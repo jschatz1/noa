@@ -7,13 +7,13 @@ class Component {
 }
 
 class Button extends Component {
-  pub SpecificPerson() {
+  pub Button() {
   }
 }
 
 extension Button {
-  name:string = 2;
-  label:string = 2;
+  pub name:string = 2;
+  pvt label:string = 2;
 
   pub render() {
     return 2;
