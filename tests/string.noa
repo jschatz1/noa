@@ -1,0 +1,11 @@
+"Hello this is the Noa language";
+
+"Hello this is the Noa Language with a \"quote inside\"";
+
+"Hello this is the Noa Language with multiple \"quotes\" \"inside\" and stuff on the end";
+
+'Hello this is the Noa language';
+
+'Hello this is the Noa Language with a \'quote inside\'';
+
+'Hello this is the Noa Language with multiple \'quotes\' \'inside\' and stuff on the end';

@@ -1,0 +1,27 @@
+{
+  "name": "noalang",
+  "version": "0.0.1",
+  "description": "The noa language source code",
+  "main": "noa.bnf",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "conflicts": "jison -p lalr -t grammer/noa.bnf -t > log",
+    "test": "set -e;for i in tests/*.noa; do echo \"Testing $i\";syntax-cli --grammar grammer/noa.bnf --mode LALR1 --file $i --validate; done",
+    "build": "set -e && syntax-cli --grammar grammer/noa.bnf --mode LALR1 --output out.js && browserify noa_require.js -o noa.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jschatz1/noa.git"
+  },
+  "keywords": [
+    "lang"
+  ],
+  "author": "Jacob Schatz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jschatz1/noa/issues"
+  },
+  "homepage": "https://github.com/jschatz1/noa#readme"
+}
